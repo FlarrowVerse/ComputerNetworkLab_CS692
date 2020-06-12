@@ -1,0 +1,10 @@
+Build Instructions:
+
+1) To compile and run any file:
+	$ make file=<file name without the .c extension>
+2) To compile any file:
+	$ make compile file=<file name without the .c extension>
+3) To run any file:
+	$ make run file=<file name without the .c extension>
+
+Wireshark capture file is also provided with the program files

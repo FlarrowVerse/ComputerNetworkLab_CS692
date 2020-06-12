@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/shm.h>
+#include "./Student/studentSorter.h"
 
 #define PERMS 0644
 struct my_msgbuf {
@@ -15,31 +16,53 @@ struct my_msgbuf {
 };
 
 int main(void) {
-   struct my_msgbuf buf;
-   int msqid, toend, i;
-   key_t key;
+	struct my_msgbuf buf;
+	int msqid, toend, i;
+	key_t key;
    
-   if ((key = ftok("msgq_buffer.txt", 'B')) == -1) {
-      perror("ftok");
-      exit(1);
-   }
+	if ((key = ftok("msgq_buffer.txt", 'B')) == -1) {
+    	perror("ftok");
+    	exit(1);
+	}
    
-   if ((msqid = msgget(key, PERMS)) == -1) { /* connect to the queue */
-      perror("msgget");
-      exit(1);
-   }
-   printf("message queue: ready to receive messages.\n");
-   msgrcv(msqid, &buf, 200, 0, 0);
-   int n = atoi(buf.mtext);
-   printf("received: %d\n", n);
+	if ((msqid = msgget(key, PERMS)) == -1) { /* connect to the queue */
+    	perror("msgget");
+    	exit(1);
+	}
+	printf("message queue: ready to receive messages.\n");
+	msgrcv(msqid, &buf, sizeof(buf.mtext), 1, 0);
+	int n = atoi(buf.mtext);
+	printf("received: %d\n", n);
 
-   // int *arr = (int *)calloc(n, sizeof(int));
-   int *arr = NULL;
-   msgrcv(msqid, arr, n * sizeof(int), 0, 0);
-   for (i = 0; i < n; i++) {
-      printf("%d ", arr[i]);
-   }
-   printf("\ndone receiving...\n");
-   system("rm msgq.txt");
-   return 0;
+	student **records = (student **)calloc(n, sizeof(student *));
+   
+	for (i = 0; i < n; i++) {
+    	msgrcv(msqid, &buf, sizeof(buf.mtext), 1, 0);
+    	records[i] = parseStudent(buf.mtext);
+    	printf("Recieved: %s\n", buf.mtext);
+    	
+    	sleep(1);
+   	}
+
+   	sortStudents(records, n, "roll");
+
+	for (i = 0; i < n; i++) {
+    	char *buff = toString(records[i]);
+    	printf("%s\n", buff);
+    	free(buff);
+	}
+
+	for (i = 0; i < n; i++) {
+		char *buff = toString(records[i]);
+		strcpy(buf.mtext, buff);
+		buf.mtype = 1;
+		msgsnd(msqid, &buf, sizeof(buf.mtext), 0);
+		free(buff);
+		free(records[i]);
+		sleep(1);
+	}
+
+	printf("\ndone receiving...\n");
+   
+	return 0;
 }

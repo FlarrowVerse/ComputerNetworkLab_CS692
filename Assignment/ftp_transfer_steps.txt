@@ -1,0 +1,18 @@
+Steps for file transfer using an FTP server:
+
+1) User must download and install an FTP Client like FileZilla.
+
+2) Users need to create a new connection profile
+
+3) Entering the server  details like - FTP address, username, password, port(default 21, most applications use 8081/8080)
+
+4) User must connect to the FTP Server, after making sure that the server is already up and running
+
+5) The folder that can communicate wiht the remote system will be shown by FileZilla on the right hand side. User can also provide restrictions while sharing
+folder or files with the server
+
+6) User will be able to upload/download any permissible file/folder with the server.
+
+7) User must wait till FileZilla shows successful file transfer.
+
+8) User must disconnect from the server, to prevent further transfers.
